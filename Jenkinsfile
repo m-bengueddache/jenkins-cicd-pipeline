@@ -1,66 +1,46 @@
+#!/user/bin/env groovy
+
+library identifier: 'jenkins-groovy-shared-library@master', retriever: modernSCM(
+    [$class: 'GitSCMSource',
+    remote: 'https://github.com/MB-938/jenkins-groovy-shared-library.git',
+    credentialsId: 'git-credentials'
+    ]
+)
+
+def gv
 pipeline {
     agent any
     tools {
         maven 'maven'
     }
     stages {
-        stage("increment version") {
+        stage("init") {
             steps {
                 script {
-                    echo 'incrementing app version...'
-                    sh 'mvn build-helper:parse-version versions:set \
-                    -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} \
-                    versions:commit'
-                   def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
-                   def version = matcher[0][1]
-                   env.IMAGE_NAME = "$version-$BUILD_NUMBER"
+                    gv = load "script.groovy"
                 }
             }
         }
-        stage("build app") {
+        stage("build jar") {
             steps {
                 script {
-                    echo 'building the application...'
-                    sh 'mvn clean package'
+                    buildJar()
                 }
             }
         }
-        stage("build image") {
+        stage("build and push image") {
             steps {
                 script {
-                    echo "building the docker image..."
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh "docker build -t mb938/demo-app:${IMAGE_NAME} ."
-                        sh 'echo $PASS | docker login -u $USER --password-stdin'
-                        sh "docker push mb938/demo-app:${IMAGE_NAME}"
-                    }
+                    buildImage 'mb938/demo-app:jma-3.0'
+                    dockerLogin()
+                    dockerPush 'mb938/demo-app:jma-3.0'
                 }
             }
         }
         stage("deploy") {
             steps {
                 script {
-                    echo "Deploying the application"
-                }
-            }
-        }
-        stage ("commit version update") {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'git-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh 'git config --global user.email "jenkins@example.com"'
-                        sh 'git config --global user.name "jenkins"'
-                        
-                        sh 'git status'
-                        sh 'git branch'
-                        sh 'git config --list'
-
-                        sh 'git remote set-url origin https://${USER}:${PASS}@github.com/MB-938/Jenkins-Project.git '
-                        sh 'git add .'
-                        sh 'git commit -m "ci: version bump"'
-                        sh 'git push origin HEAD:jenkins-jobs'
-                        echo "RESOLVING COMMIT LOOP..."
-                    }
+                    gv.deployApp()
                 }
             }
         }
