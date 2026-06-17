@@ -2,7 +2,7 @@
 
 library identifier: 'jenkins-groovy-shared-library@master', retriever: modernSCM(
     [$class: 'GitSCMSource',
-    remote: 'https://github.com/MB-938/jenkins-groovy-shared-library.git',
+    remote: 'https://github.com/m-bengueddache/jenkins-groovy-shared-library.git',
     credentialsId: 'git-credentials'
     ]
 )
