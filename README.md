@@ -54,57 +54,11 @@ This project demonstrates setting up a complete declarative Jenkins pipeline to 
 
 ## FR — Évolution : Shared Library (`jenkins-shared-lib` branch)
 
-La branche [`jenkins-shared-lib`](https://github.com/m-bengueddache/jenkins-cicd-pipeline/tree/jenkins-shared-lib) représente l'étape suivante du projet : les étapes de build et push Docker sont extraites du `Jenkinsfile` et déléguées à une [Jenkins Shared Library](https://github.com/m-bengueddache/jenkins-groovy-shared-library) externe.
-
-**Avant (inline dans le Jenkinsfile) :**
-```groovy
-sh "docker build -t mb938/demo-app:${IMAGE_NAME} ."
-sh 'echo $PASS | docker login -u $USER --password-stdin'
-sh "docker push mb938/demo-app:${IMAGE_NAME}"
-```
-
-**Après (via la Shared Library) :**
-```groovy
-buildImage 'mb938/demo-app:jma-3.0'
-dockerLogin()
-dockerPush 'mb938/demo-app:jma-3.0'
-```
-
-La librairie est chargée directement dans le `Jenkinsfile` sans configuration Jenkins admin requise :
-```groovy
-library identifier: 'jenkins-groovy-shared-library@master', retriever: modernSCM(
-    [$class: 'GitSCMSource',
-    remote: 'https://github.com/m-bengueddache/jenkins-groovy-shared-library.git',
-    credentialsId: 'git-credentials']
-)
-```
+La branche [`jenkins-shared-lib`](https://github.com/m-bengueddache/jenkins-cicd-pipeline/tree/jenkins-shared-lib) extrait les étapes de build et push Docker du `Jenkinsfile` vers une [Jenkins Shared Library](https://github.com/m-bengueddache/jenkins-groovy-shared-library) externe. Les appels `buildImage()`, `dockerLogin()`, `dockerPush()` remplacent les commandes shell inline — la librairie est chargée directement dans le `Jenkinsfile` sans configuration Jenkins admin requise.
 
 ## EN — Evolution: Shared Library (`jenkins-shared-lib` branch)
 
-The [`jenkins-shared-lib`](https://github.com/m-bengueddache/jenkins-cicd-pipeline/tree/jenkins-shared-lib) branch represents the next step of the project: Docker build and push steps are extracted from the `Jenkinsfile` and delegated to an external [Jenkins Shared Library](https://github.com/m-bengueddache/jenkins-groovy-shared-library).
-
-**Before (inline in Jenkinsfile):**
-```groovy
-sh "docker build -t mb938/demo-app:${IMAGE_NAME} ."
-sh 'echo $PASS | docker login -u $USER --password-stdin'
-sh "docker push mb938/demo-app:${IMAGE_NAME}"
-```
-
-**After (via Shared Library):**
-```groovy
-buildImage 'mb938/demo-app:jma-3.0'
-dockerLogin()
-dockerPush 'mb938/demo-app:jma-3.0'
-```
-
-The library is loaded directly in the `Jenkinsfile` with no Jenkins admin configuration required:
-```groovy
-library identifier: 'jenkins-groovy-shared-library@master', retriever: modernSCM(
-    [$class: 'GitSCMSource',
-    remote: 'https://github.com/m-bengueddache/jenkins-groovy-shared-library.git',
-    credentialsId: 'git-credentials']
-)
-```
+The [`jenkins-shared-lib`](https://github.com/m-bengueddache/jenkins-cicd-pipeline/tree/jenkins-shared-lib) branch extracts Docker build and push steps from the `Jenkinsfile` into an external [Jenkins Shared Library](https://github.com/m-bengueddache/jenkins-groovy-shared-library). Calls to `buildImage()`, `dockerLogin()`, `dockerPush()` replace inline shell commands — the library is loaded directly in the `Jenkinsfile` with no Jenkins admin configuration required.
 
 ---
 
