@@ -27,7 +27,6 @@ Ce projet démontre la mise en place d'un pipeline Jenkins déclaratif complet p
 4. **Deploy** — Placeholder pour le déploiement (à étendre selon l'environnement cible)
 5. **Commit version update** — Commit et push le `pom.xml` mis à jour dans le repo Git
 
-**Concepts démontrés :**
 - Utilisation de `readFile()` et regex Groovy pour extraire la version depuis le XML
 - Gestion sécurisée des credentials Jenkins (`withCredentials`)
 - Évitement de la boucle de trigger infinie (commit Jenkins → build → commit → ...)
@@ -44,7 +43,6 @@ This project demonstrates setting up a complete declarative Jenkins pipeline to 
 4. **Deploy** — Placeholder for deployment (to extend based on target environment)
 5. **Commit version update** — Commits and pushes the updated `pom.xml` back to the Git repo
 
-**Concepts demonstrated:**
 - Using `readFile()` and Groovy regex to extract version from XML
 - Secure credentials management in Jenkins (`withCredentials`)
 - Avoiding infinite trigger loops (Jenkins commit → build → commit → ...)
